@@ -3,14 +3,14 @@ import * as d3 from 'd3-fetch'
 
 type BillData = {
   time: string,
-  type: number,
+  type: string,
   category: string,
-  amount: number,
+  amount: string,
 }
 
 type CategoryData = {
   id: string,
-  type: number,
+  type: string,
   name: string
 }
 
@@ -52,16 +52,17 @@ export default class Bills extends React.Component<Props, State> {
     }
 }
 
-function getData(billsComponent: React.Component<Props, State>) {
+function getData(billsComponent: React.Component) {
   //get categories first
   var csv_file_path = require("./data/bill_categories.csv");
   d3.csv(csv_file_path).then(function(data) {
-    billsComponent.setState({categories: data})
+    billsComponent.setState({categories: data});
+    
     getBills(billsComponent);
   });
 }
 
-function getBills(billsComponent: React.Component<Props, State>) {
+function getBills(billsComponent: React.Component) {
   var csv_file_path = require("./data/bills.csv");
   d3.csv(csv_file_path).then(function(data) {
     billsComponent.setState({bills: data})
