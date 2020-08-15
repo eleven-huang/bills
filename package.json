@@ -11,12 +11,14 @@
     "@types/node": "^12.12.54",
     "@types/papaparse": "^5.0.6",
     "@types/react": "^16.9.46",
+    "@types/react-bootstrap": "^0.32.22",
     "@types/react-dom": "^16.9.8",
-    "papaparse": "^5.2.0",
+    "@types/react-router-dom": "^5.1.5",
+    "bootstrap": "^4.5.2",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.3.0",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.3",
-    "typescript": "^3.7.5"
+    "react-scripts": "3.4.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -40,7 +42,8 @@
     ]
   },
   "devDependencies": {
-    "d3-fetch": "^1.2.0"
+    "d3-fetch": "^1.2.0",
+    "typescript": "^3.9.7"
   },
   "proxy": "http://localhost:3000"
 }
