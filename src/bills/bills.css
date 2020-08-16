@@ -1,0 +1,18 @@
+.filters {
+    float: left;
+    margin-bottom: 1rem;
+}
+
+.react-datepicker__input-container > input {
+  width: 80px;
+  height: 30px;
+}
+
+
+.green {
+  color: green;
+}
+
+.red {
+  color: red;
+}
