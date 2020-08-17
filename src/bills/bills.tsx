@@ -10,13 +10,19 @@ import zh from "date-fns/locale/zh-CN";
 registerLocale("zh-CN", zh);
 
 
-const PAID: number = 0;
-const RECEIVED: number = 1;
+export const PAID: number = 0;
+export const RECEIVED: number = 1;
 export const ALL: string = "所有";
+export const ALL_BILL_TYPE = -1;
 
 type CategoryOption = {
     id: string,
     name: string
+}
+
+type BillTypeOption = {
+  type: number,
+  name: string
 }
 
 export type BillData = {
@@ -25,7 +31,8 @@ export type BillData = {
   category: string,
   amount: number,
   isFilteredByMonth: boolean,
-  isFilteredByCategory: boolean
+  isFilteredByCategory: boolean,
+  isFilteredByBillType: boolean
 }
 
 export type CategoryData = {
@@ -38,6 +45,8 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [selectedDate, setSelectedDate] = useState<Date>();
     const [selectedCategoryOption, setSelectedCategoryOption] = useState<CategoryOption>();
+    const [selectedBillTypeOption, setSelectedBillTypeOption] = useState<BillTypeOption>();
+
     const [bills, dispatch] = useReducer(reducer, []);
 
     const getData = (): void => {
@@ -88,7 +97,22 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       return listCategoryOptions;
     }
 
-    const billsForShow = bills.filter(bill => bill.isFilteredByMonth && bill.isFilteredByCategory);
+    const getListBillTypeOptions = () => {
+      const billTypeOptions: BillTypeOption[] = getBillTypeOptions();
+      const listBillTypeOptions: any = [];
+      billTypeOptions.forEach((option: BillTypeOption) => {
+        listBillTypeOptions.push(<Dropdown.Item key={option.type} onClick={() => selectBillTypeOption(option)}>{option.name}</Dropdown.Item>);
+      })
+
+      return listBillTypeOptions;
+    }
+
+    const selectBillTypeOption = (option: BillTypeOption) => {
+      setSelectedBillTypeOption(option);
+      dispatch({type: "FILTER_BILL_TYPE", bill_type: option.type})
+    }
+
+    const billsForShow = getBillsForShow(bills);
     const listBills = billsForShow.map((bill: BillData, index: number) => {
         const category: CategoryData = getCategoryById(categories, bill.category);
 
@@ -126,6 +150,18 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
 
               <Dropdown.Menu>
                 {getListCategoryOptions()}
+              </Dropdown.Menu>
+            </Dropdown>
+          </span>
+          <span className="filter">
+            <strong className="filterName">类型</strong>
+            <Dropdown>
+              <Dropdown.Toggle variant="light" id="dropdown-light">
+                {selectedBillTypeOption? selectedBillTypeOption.name : ALL}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {getListBillTypeOptions()}
               </Dropdown.Menu>
             </Dropdown>
           </span>
@@ -170,7 +206,7 @@ function getConstructedBillData(data: any): BillData[] {
     const type: number = parseInt(bill.type);
     const time: number = parseInt(bill.time);
 
-    bills.push({type, amount, time: time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true});
+    bills.push({type, amount, time: time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true, isFilteredByBillType: true});
   })
 
   return bills;
@@ -225,6 +261,18 @@ function getCategoryOptions(categories: CategoryData[]): CategoryOption[] {
   });
 
   return options;
+}
+
+function getBillTypeOptions(): BillTypeOption[] {
+  return [
+    {type: ALL_BILL_TYPE, name: ALL},
+    {type: PAID, name: "支出"},
+    {type: RECEIVED, name: "收入"}
+  ]
+}
+
+function getBillsForShow(bills: BillData[]): BillData[] {
+  return bills.filter(bill => bill.isFilteredByMonth && bill.isFilteredByCategory && bill.isFilteredByBillType);
 }
 
 

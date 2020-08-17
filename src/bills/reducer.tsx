@@ -1,8 +1,9 @@
-import {BillData, ALL} from './bills'
+import {BillData, ALL, ALL_BILL_TYPE, PAID, RECEIVED} from './bills'
 
 export type BillsAction =
   | { type: "FILTER_MONTH", year: number, month: number}
   | { type: "FILTER_CATEGORY", category: string}
+  | { type: "FILTER_BILL_TYPE", bill_type: number }
   | { type: "RESET", bills: BillData[]}
   | { type: "SHOW_ALL"};
 
@@ -15,7 +16,7 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
             isFilteredByMonth = true;
         }
 
-        return {...bill, isFilteredByMonth: isFilteredByMonth};
+        return {...bill, isFilteredByMonth};
       })
 
       return billsInTheSameMonth;
@@ -31,10 +32,27 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
             isFilteredByCategory = true;
           }
 
-          return {...bill, isFilteredByCategory: isFilteredByCategory};
+          return {...bill, isFilteredByCategory};
         })
 
         return billsInTheSameCategory;
+      }
+    case "FILTER_BILL_TYPE":
+      if (action.bill_type === ALL_BILL_TYPE) {
+        return bills.map((bill: BillData) => {
+          return {...bill, isFilteredByBillType: true}
+        })
+      } else {
+        const billsInTheSameType = bills.map((bill: BillData) => {
+          let isFilteredByBillType = false;
+          if (bill.type === action.bill_type){
+            isFilteredByBillType = true;
+          }
+
+          return {...bill, isFilteredByBillType};
+        })
+
+        return billsInTheSameType;
       }
     case "RESET":
       return action.bills;

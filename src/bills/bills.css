@@ -18,6 +18,11 @@
   border: 1px solid gray;
 }
 
+.react-datepicker__tab-loop, .react-datepicker-popper, .react-datepicker__tab-loop__end {
+  display: inline-block;
+}
+
+
 
 .green {
   color: green;
