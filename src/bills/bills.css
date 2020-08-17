@@ -22,8 +22,6 @@
   display: inline-block;
 }
 
-
-
 .green {
   color: green;
 }
@@ -47,4 +45,8 @@
   text-align: left;
   margin-top: 0;
   vertical-align: top;
+}
+
+.add-bill {
+  float: right;
 }

@@ -2,12 +2,14 @@ import React, {useReducer, useState, useMemo} from 'react';
 import {reducer} from './reducer';
 import './bills.css'
 import * as d3 from 'd3-fetch'
-import {Table, Container, Dropdown, Button} from 'react-bootstrap'
+import {Table, Container, Dropdown} from 'react-bootstrap'
+import Statistics from './statistics';
 
 import DatePicker, { registerLocale }  from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css";
-import zh from "date-fns/locale/zh-CN";
+import "react-datepicker/dist/react-datepicker.css"
+import zh from "date-fns/locale/zh-CN"
 registerLocale("zh-CN", zh);
+
 
 
 export const PAID: number = 0;
@@ -41,10 +43,6 @@ export type CategoryData = {
   name: string
 }
 
-export type BillStatistic = {
-  category_name: string,
-  amount: number
-}
 
 const Bills: React.FunctionComponent = (): JSX.Element => {
     const [categories, setCategories] = useState<CategoryData[]>([]);
@@ -117,31 +115,6 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       dispatch({type: "FILTER_BILL_TYPE", bill_type: option.type})
     }
 
-    const getListStatistics = (bills: BillData[]): JSX.Element => {
-      const statistics: BillStatistic[] = getBillStatistics(bills, categories);
-      const listStatistics: any = [];
-
-      statistics.forEach((statistic: BillStatistic) => {
-        listStatistics.push(
-          <tr key={statistic.category_name}>
-            <td>{statistic.category_name}</td>
-            <td>{statistic.amount}</td>
-          </tr>
-        )
-      });
-
-      listStatistics.push(
-        <tr>
-          <td colSpan={4}>
-            <strong><span className="red">总计:</span> {getStatisticsAmount(statistics)} </strong>
-          </td>
-        </tr>
-      );
-
-      return listStatistics;
-    }
-
-
     const billsForShow = getBillsForShow(bills);
     const listBills = billsForShow.map((bill: BillData, index: number) => {
         const category: CategoryData = getCategoryById(categories, bill.category);
@@ -159,7 +132,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     return (
       <Container className="container" fluid="md">
 
-        <div className="filters">
+        <span className="filters">
           <span className="filter">
             <strong className="filterName">月份</strong>
             <DatePicker
@@ -196,7 +169,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
               </Dropdown.Menu>
             </Dropdown>
           </span>
-        </div>
+        </span>
 
         <Table className="bills" striped bordered hover>
           <thead>
@@ -218,18 +191,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
           </tbody>
         </Table>
 
-        <h4><span className="red">支出</span>分类统计</h4>
-        <Table className="statistics" striped bordered hover>
-          <thead>
-            <tr>
-              <th>分类</th>
-              <th>金额汇总</th>
-            </tr>
-          </thead>
-          <tbody>
-            {getListStatistics(billsForShow)}
-          </tbody>
-        </Table>
+        <Statistics bills={billsForShow} categories={categories}/>
       </Container>
     )
 }
@@ -319,44 +281,6 @@ function getBillTypeOptions(): BillTypeOption[] {
 
 function getBillsForShow(bills: BillData[]): BillData[] {
   return bills.filter(bill => bill.isFilteredByMonth && bill.isFilteredByCategory && bill.isFilteredByBillType);
-}
-
-function getBillStatistics(bills: BillData[], categories: CategoryData[]): BillStatistic[] {
-  const statistics: BillStatistic[] = [];
-  const categories_for_paid: CategoryData[] = getCategoriesForPaid(categories);
-
-  categories_for_paid.forEach((category: CategoryData) => {
-    const billsForCategory = bills.filter((bill: BillData) => bill.category === category.id);
-    if (billsForCategory.length > 0) {
-      let amount = 0;
-      billsForCategory.forEach((bill: BillData) => {
-        amount += bill.amount;
-      })
-
-      statistics.push({category_name: category.name, amount})
-    }
-  })
-
-  return getSortedStatistics(statistics);
-}
-
-function getCategoriesForPaid(categories: CategoryData[]): CategoryData[] {
-    return categories.filter((category: CategoryData) => category.type === PAID);
-}
-
-function getSortedStatistics(statistics: BillStatistic[]) {
-  return statistics.sort((a, b) => {
-    return b.amount - a.amount;
-  })
-}
-
-function getStatisticsAmount(statistics: BillStatistic[]): number {
-  let amount = 0;
-  statistics.forEach((statistic: BillStatistic) => {
-    amount += statistic.amount;
-  })
-
-  return amount;
 }
 
 function cssClassNameForBillType(bill_type: number): string {
