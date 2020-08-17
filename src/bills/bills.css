@@ -3,9 +3,19 @@
     margin-bottom: 1rem;
 }
 
+.filter {
+  padding-right: 10px;
+}
+
+.filterName {
+  padding-right: 2px;
+}
+
 .react-datepicker__input-container > input {
   width: 80px;
   height: 30px;
+  background-color: white;
+  border: 1px solid gray;
 }
 
 
@@ -15,4 +25,21 @@
 
 .red {
   color: red;
+}
+
+.dropdown {
+  display: inline;
+  margin-top: 0;
+}
+
+.dropdown > .btn-light {
+  width: 100px;
+  height: 30px;
+  border-radius: 0;
+  padding: 1px 2px;
+  background-color: white;
+  border: 1px solid gray;
+  text-align: left;
+  margin-top: 0;
+  vertical-align: top;
 }

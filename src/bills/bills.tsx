@@ -2,7 +2,7 @@ import React, {useReducer, useState, useMemo} from 'react';
 import {reducer} from './reducer';
 import './bills.css'
 import * as d3 from 'd3-fetch'
-import {Table, Container} from 'react-bootstrap'
+import {Table, Container, Dropdown} from 'react-bootstrap'
 
 import DatePicker, { registerLocale }  from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,13 +12,20 @@ registerLocale("zh-CN", zh);
 
 const PAID: number = 0;
 const RECEIVED: number = 1;
+export const ALL: string = "所有";
+
+type CategoryOption = {
+    id: string,
+    name: string
+}
 
 export type BillData = {
   time: number,
   type: number,
   category: string,
   amount: number,
-  isShow: boolean
+  isFilteredByMonth: boolean,
+  isFilteredByCategory: boolean
 }
 
 export type CategoryData = {
@@ -30,6 +37,7 @@ export type CategoryData = {
 const Bills: React.FunctionComponent = (): JSX.Element => {
     const [categories, setCategories] = useState<CategoryData[]>([]);
     const [selectedDate, setSelectedDate] = useState<Date>();
+    const [selectedCategoryOption, setSelectedCategoryOption] = useState<CategoryOption>();
     const [bills, dispatch] = useReducer(reducer, []);
 
     const getData = (): void => {
@@ -65,7 +73,22 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       }
     }
 
-    const billsForShow = bills.filter(bill => bill.isShow);
+    const selectCategoryOption = (option: CategoryOption) => {
+      setSelectedCategoryOption(option);
+      dispatch({type: "FILTER_CATEGORY", category: option.id});
+    }
+
+    const getListCategoryOptions = () => {
+      const categoryOptions: CategoryOption[] = getCategoryOptions(categories);
+      const listCategoryOptions: any = [];
+      categoryOptions.forEach((option: CategoryOption) => {
+        listCategoryOptions.push(<Dropdown.Item key={option.id} onClick={() => selectCategoryOption(option)}>{option.name}</Dropdown.Item>);
+      });
+
+      return listCategoryOptions;
+    }
+
+    const billsForShow = bills.filter(bill => bill.isFilteredByMonth && bill.isFilteredByCategory);
     const listBills = billsForShow.map((bill: BillData, index: number) => {
         const category: CategoryData = getCategoryById(categories, bill.category);
 
@@ -82,18 +105,30 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     return (
       <Container className="container" fluid="md">
         <div className="filters">
-          <div>
-            <strong>月份</strong>
+          <span className="filter">
+            <strong className="filterName">月份</strong>
             <DatePicker
               selected={selectedDate}
               onChange={date => selectDate(date)}
               dateFormat="yyyy/MM"
               showMonthYearPicker
               locale="zh-CN"
-              placeholderText="所有"
+              placeholderText={ALL}
               openToDate={new Date("2019/01/01")}
             />
-          </div>
+          </span>
+          <span className="filter">
+            <strong className="filterName">分类</strong>
+            <Dropdown>
+              <Dropdown.Toggle variant="light" id="dropdown-light">
+                {selectedCategoryOption? selectedCategoryOption.name : ALL}
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                {getListCategoryOptions()}
+              </Dropdown.Menu>
+            </Dropdown>
+          </span>
         </div>
         <Table striped bordered hover>
           <thead>
@@ -135,7 +170,7 @@ function getConstructedBillData(data: any): BillData[] {
     const type: number = parseInt(bill.type);
     const time: number = parseInt(bill.time);
 
-    bills.push({type, amount, time: time, category: bill.category, isShow: true});
+    bills.push({type, amount, time: time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true});
   })
 
   return bills;
@@ -183,8 +218,13 @@ function dateFormat(timestamp: number): string {
   return date.toLocaleDateString("zh-CN")
 }
 
-function amountByCategories(bills: BillData[]) {
+function getCategoryOptions(categories: CategoryData[]): CategoryOption[] {
+  const options: CategoryOption[] = [{id: ALL, name: ALL}];
+  categories.forEach((category: CategoryData) => {
+    options.push({id: category.id, name: category.name});
+  });
 
+  return options;
 }
 
 
