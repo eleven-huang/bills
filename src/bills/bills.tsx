@@ -2,7 +2,7 @@ import React, {useReducer, useState, useMemo} from 'react';
 import {reducer} from './reducer';
 import './bills.css'
 import * as d3 from 'd3-fetch'
-import {Table, Container, Dropdown} from 'react-bootstrap'
+import {Table, Container, Dropdown, Button} from 'react-bootstrap'
 
 import DatePicker, { registerLocale }  from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css";
@@ -39,6 +39,11 @@ export type CategoryData = {
   id: string,
   type: number,
   name: string
+}
+
+export type BillStatistic = {
+  category_name: string,
+  amount: number
 }
 
 const Bills: React.FunctionComponent = (): JSX.Element => {
@@ -112,6 +117,22 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       dispatch({type: "FILTER_BILL_TYPE", bill_type: option.type})
     }
 
+    const getListStatistics = (bills: BillData[]) => {
+      const statistics: BillStatistic[] = getBillStatistics(bills, categories);
+      console.log(statistics);
+      const listStatistics = statistics.map((statistic: BillStatistic) => {
+        return(
+          <tr key={statistic.category_name}>
+            <td>{statistic.category_name}</td>
+            <td>{statistic.amount}</td>
+          </tr>
+        )
+      });
+
+      return listStatistics;
+    }
+
+
     const billsForShow = getBillsForShow(bills);
     const listBills = billsForShow.map((bill: BillData, index: number) => {
         const category: CategoryData = getCategoryById(categories, bill.category);
@@ -177,13 +198,27 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
           </thead>
           <tbody>
             {listBills}
+            <tr>
+              <td colSpan={4}>
+                <strong className="red">支出: {billsPaidAmount(billsForShow)} </strong>
+                <strong className="green">收入: {billsReceivedAmount(billsForShow)}</strong>
+              </td>
+            </tr>
           </tbody>
         </Table>
 
-        <div className="footer">
-          <strong className="red">支出: {billsPaidAmount(billsForShow)} </strong>
-          <strong className="green">收入: {billsReceivedAmount(billsForShow)}</strong>
-        </div>
+        <h4>支出分类统计</h4>
+        <Table className="statistics" striped bordered hover>
+          <thead>
+            <tr>
+              <th>分类</th>
+              <th>金额汇总</th>
+            </tr>
+          </thead>
+          <tbody>
+            {getListStatistics(billsForShow)}
+          </tbody>
+        </Table>
       </Container>
     )
 }
@@ -273,6 +308,31 @@ function getBillTypeOptions(): BillTypeOption[] {
 
 function getBillsForShow(bills: BillData[]): BillData[] {
   return bills.filter(bill => bill.isFilteredByMonth && bill.isFilteredByCategory && bill.isFilteredByBillType);
+}
+
+function getBillStatistics(bills: BillData[], categories: CategoryData[]): BillStatistic[] {
+  const statistics: BillStatistic[] = [];
+  const categories_for_paid = categories.filter((category: CategoryData) => category.type === PAID);
+
+  categories_for_paid.forEach((category: CategoryData) => {
+    const billsForCategory = bills.filter((bill: BillData) => bill.category === category.id);
+    if (billsForCategory.length > 0) {
+      let amount = 0;
+      billsForCategory.forEach((bill: BillData) => {
+        amount += bill.amount;
+      })
+
+      statistics.push({category_name: category.name, amount})
+    }
+  })
+
+  return getSortedStatistics(statistics);
+}
+
+function getSortedStatistics(statistics: BillStatistic[]) {
+  return statistics.sort((a, b) => {
+    return a.amount - b.amount;
+  })
 }
 
 
