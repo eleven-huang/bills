@@ -61,7 +61,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       if (date === null) {
         dispatch({type: "SHOW_ALL"});
       } else {
-        dispatch({type: "FILTER_MONTH", month: date.getMonth()});
+        dispatch({type: "FILTER_MONTH", year: date.getFullYear(), month: date.getMonth()});
       }
     }
 
@@ -181,6 +181,10 @@ function billsReceivedAmount(bills: BillData[]): number {
 function dateFormat(timestamp: number): string {
   const date = new Date(timestamp);
   return date.toLocaleDateString("zh-CN")
+}
+
+function amountByCategories(bills: BillData[]) {
+
 }
 
 

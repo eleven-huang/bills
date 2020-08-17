@@ -1,7 +1,7 @@
 import {BillData} from './bills'
 
 export type BillsAction =
-  | { type: "FILTER_MONTH", month: number}
+  | { type: "FILTER_MONTH", year: number, month: number}
   | { type: "RESET", bills: BillData[]}
   | { type: "SHOW_ALL"};
 
@@ -9,11 +9,13 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
   switch (action.type) {
     case "FILTER_MONTH":
       return bills.map((bill: BillData) => {
-        if (monthFromBillData(bill) !== action.month) {
-          return {...bill, isShow: false}
+        let isShow: boolean = false;
+
+        if (isTheRightMonth(bill, action.year, action.month)) {
+            isShow = true;
         }
 
-        return {...bill, isShow: true};
+        return {...bill, isShow: isShow};
       });
 
     case "RESET":
@@ -29,7 +31,7 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
   }
 }
 
-function monthFromBillData(bill: BillData): number {
+function isTheRightMonth(bill: BillData, year: number, month: number) {
   const date = new Date(bill.time);
-  return date.getMonth();
+  return (date.getFullYear() === year && date.getMonth() === month)
 }
