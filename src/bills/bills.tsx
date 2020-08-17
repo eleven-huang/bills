@@ -78,7 +78,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       getData();
     }, [])
 
-    const selectDate = (date: any) => {
+    const selectDate = (date: any): void => {
       setSelectedDate(date);
       if (date === null) {
         dispatch({type: "SHOW_ALL"});
@@ -87,12 +87,12 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       }
     }
 
-    const selectCategoryOption = (option: CategoryOption) => {
+    const selectCategoryOption = (option: CategoryOption): void => {
       setSelectedCategoryOption(option);
       dispatch({type: "FILTER_CATEGORY", category: option.id});
     }
 
-    const getListCategoryOptions = () => {
+    const getListCategoryOptions = (): JSX.Element => {
       const categoryOptions: CategoryOption[] = getCategoryOptions(categories);
       const listCategoryOptions: any = [];
       categoryOptions.forEach((option: CategoryOption) => {
@@ -102,7 +102,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       return listCategoryOptions;
     }
 
-    const getListBillTypeOptions = () => {
+    const getListBillTypeOptions = (): JSX.Element => {
       const billTypeOptions: BillTypeOption[] = getBillTypeOptions();
       const listBillTypeOptions: any = [];
       billTypeOptions.forEach((option: BillTypeOption) => {
@@ -112,22 +112,31 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       return listBillTypeOptions;
     }
 
-    const selectBillTypeOption = (option: BillTypeOption) => {
+    const selectBillTypeOption = (option: BillTypeOption): void => {
       setSelectedBillTypeOption(option);
       dispatch({type: "FILTER_BILL_TYPE", bill_type: option.type})
     }
 
-    const getListStatistics = (bills: BillData[]) => {
+    const getListStatistics = (bills: BillData[]): JSX.Element => {
       const statistics: BillStatistic[] = getBillStatistics(bills, categories);
-      console.log(statistics);
-      const listStatistics = statistics.map((statistic: BillStatistic) => {
-        return(
+      const listStatistics: any = [];
+
+      statistics.forEach((statistic: BillStatistic) => {
+        listStatistics.push(
           <tr key={statistic.category_name}>
             <td>{statistic.category_name}</td>
             <td>{statistic.amount}</td>
           </tr>
         )
       });
+
+      listStatistics.push(
+        <tr>
+          <td colSpan={4}>
+            <strong><span className="red">总计:</span> {getStatisticsAmount(statistics)} </strong>
+          </td>
+        </tr>
+      );
 
       return listStatistics;
     }
@@ -142,13 +151,14 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
             <td>{bill.amount}</td>
             <td>{category.name}</td>
             <td>{dateFormat(bill.time)}</td>
-            <td>{billTypeName(bill.type)}</td>
+            <td className={cssClassNameForBillType(bill.type)}>{billTypeName(bill.type)}</td>
           </tr>
         )
     });
 
     return (
       <Container className="container" fluid="md">
+
         <div className="filters">
           <span className="filter">
             <strong className="filterName">月份</strong>
@@ -187,7 +197,8 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
             </Dropdown>
           </span>
         </div>
-        <Table striped bordered hover>
+
+        <Table className="bills" striped bordered hover>
           <thead>
             <tr>
               <th>金额</th>
@@ -200,14 +211,14 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
             {listBills}
             <tr>
               <td colSpan={4}>
-                <strong className="red">支出: {billsPaidAmount(billsForShow)} </strong>
-                <strong className="green">收入: {billsReceivedAmount(billsForShow)}</strong>
+                <strong><span className="red">支出:</span> {billsPaidAmount(billsForShow)} </strong>
+                <strong><span className="green">收入:</span> {billsReceivedAmount(billsForShow)}</strong>
               </td>
             </tr>
           </tbody>
         </Table>
 
-        <h4>支出分类统计</h4>
+        <h4><span className="red">支出</span>分类统计</h4>
         <Table className="statistics" striped bordered hover>
           <thead>
             <tr>
@@ -312,7 +323,7 @@ function getBillsForShow(bills: BillData[]): BillData[] {
 
 function getBillStatistics(bills: BillData[], categories: CategoryData[]): BillStatistic[] {
   const statistics: BillStatistic[] = [];
-  const categories_for_paid = categories.filter((category: CategoryData) => category.type === PAID);
+  const categories_for_paid: CategoryData[] = getCategoriesForPaid(categories);
 
   categories_for_paid.forEach((category: CategoryData) => {
     const billsForCategory = bills.filter((bill: BillData) => bill.category === category.id);
@@ -329,10 +340,29 @@ function getBillStatistics(bills: BillData[], categories: CategoryData[]): BillS
   return getSortedStatistics(statistics);
 }
 
+function getCategoriesForPaid(categories: CategoryData[]): CategoryData[] {
+    return categories.filter((category: CategoryData) => category.type === PAID);
+}
+
 function getSortedStatistics(statistics: BillStatistic[]) {
   return statistics.sort((a, b) => {
-    return a.amount - b.amount;
+    return b.amount - a.amount;
   })
+}
+
+function getStatisticsAmount(statistics: BillStatistic[]): number {
+  let amount = 0;
+  statistics.forEach((statistic: BillStatistic) => {
+    amount += statistic.amount;
+  })
+
+  return amount;
+}
+
+function cssClassNameForBillType(bill_type: number): string {
+  if (bill_type === PAID) return "red";
+
+  return "green";
 }
 
 
