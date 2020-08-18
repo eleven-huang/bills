@@ -1,7 +1,7 @@
 import React from 'react'
-import {BillData, CategoryData, PAID} from './bills'
+import {BillData, CategoryData} from './bills'
+import {PAID} from './constants'
 import {Table} from 'react-bootstrap'
-
 
 export type BillStatistic = {
   category_name: string,

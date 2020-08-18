@@ -2,30 +2,11 @@ import React, {useReducer, useState, useMemo} from 'react';
 import {reducer} from './reducer';
 import './bills.css'
 import * as d3 from 'd3-fetch'
-import {Table, Container, Dropdown} from 'react-bootstrap'
-import Statistics from './statistics';
+import {Table, Container} from 'react-bootstrap'
+import Statistics from './statistics'
+import Filters, {BillTypeOption, CategoryOption} from './filters'
+import {PAID, RECEIVED} from './constants'
 
-import DatePicker, { registerLocale }  from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
-import zh from "date-fns/locale/zh-CN"
-registerLocale("zh-CN", zh);
-
-
-
-export const PAID: number = 0;
-export const RECEIVED: number = 1;
-export const ALL: string = "所有";
-export const ALL_BILL_TYPE = -1;
-
-type CategoryOption = {
-    id: string,
-    name: string
-}
-
-type BillTypeOption = {
-  type: number,
-  name: string
-}
 
 export type BillData = {
   time: number,
@@ -43,13 +24,8 @@ export type CategoryData = {
   name: string
 }
 
-
 const Bills: React.FunctionComponent = (): JSX.Element => {
     const [categories, setCategories] = useState<CategoryData[]>([]);
-    const [selectedDate, setSelectedDate] = useState<Date>();
-    const [selectedCategoryOption, setSelectedCategoryOption] = useState<CategoryOption>();
-    const [selectedBillTypeOption, setSelectedBillTypeOption] = useState<BillTypeOption>();
-
     const [bills, dispatch] = useReducer(reducer, []);
 
     const getData = (): void => {
@@ -77,7 +53,6 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     }, [])
 
     const selectDate = (date: any): void => {
-      setSelectedDate(date);
       if (date === null) {
         dispatch({type: "SHOW_ALL"});
       } else {
@@ -86,32 +61,10 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     }
 
     const selectCategoryOption = (option: CategoryOption): void => {
-      setSelectedCategoryOption(option);
       dispatch({type: "FILTER_CATEGORY", category: option.id});
     }
 
-    const getListCategoryOptions = (): JSX.Element => {
-      const categoryOptions: CategoryOption[] = getCategoryOptions(categories);
-      const listCategoryOptions: any = [];
-      categoryOptions.forEach((option: CategoryOption) => {
-        listCategoryOptions.push(<Dropdown.Item key={option.id} onClick={() => selectCategoryOption(option)}>{option.name}</Dropdown.Item>);
-      });
-
-      return listCategoryOptions;
-    }
-
-    const getListBillTypeOptions = (): JSX.Element => {
-      const billTypeOptions: BillTypeOption[] = getBillTypeOptions();
-      const listBillTypeOptions: any = [];
-      billTypeOptions.forEach((option: BillTypeOption) => {
-        listBillTypeOptions.push(<Dropdown.Item key={option.type} onClick={() => selectBillTypeOption(option)}>{option.name}</Dropdown.Item>);
-      })
-
-      return listBillTypeOptions;
-    }
-
     const selectBillTypeOption = (option: BillTypeOption): void => {
-      setSelectedBillTypeOption(option);
       dispatch({type: "FILTER_BILL_TYPE", bill_type: option.type})
     }
 
@@ -131,45 +84,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
 
     return (
       <Container className="container" fluid="md">
-
-        <span className="filters">
-          <span className="filter">
-            <strong className="filterName">月份</strong>
-            <DatePicker
-              selected={selectedDate}
-              onChange={date => selectDate(date)}
-              dateFormat="yyyy/MM"
-              showMonthYearPicker
-              locale="zh-CN"
-              placeholderText={ALL}
-              openToDate={new Date("2019/01/01")}
-            />
-          </span>
-          <span className="filter">
-            <strong className="filterName">分类</strong>
-            <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-light">
-                {selectedCategoryOption? selectedCategoryOption.name : ALL}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                {getListCategoryOptions()}
-              </Dropdown.Menu>
-            </Dropdown>
-          </span>
-          <span className="filter">
-            <strong className="filterName">类型</strong>
-            <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-light">
-                {selectedBillTypeOption? selectedBillTypeOption.name : ALL}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu>
-                {getListBillTypeOptions()}
-              </Dropdown.Menu>
-            </Dropdown>
-          </span>
-        </span>
+        <Filters categories={categories} selectDate={selectDate} selectCategoryOption={selectCategoryOption} selectBillTypeOption={selectBillTypeOption} />
 
         <Table className="bills" striped bordered hover>
           <thead>
@@ -260,23 +175,6 @@ function billsReceivedAmount(bills: BillData[]): number {
 function dateFormat(timestamp: number): string {
   const date = new Date(timestamp);
   return date.toLocaleDateString("zh-CN")
-}
-
-function getCategoryOptions(categories: CategoryData[]): CategoryOption[] {
-  const options: CategoryOption[] = [{id: ALL, name: ALL}];
-  categories.forEach((category: CategoryData) => {
-    options.push({id: category.id, name: category.name});
-  });
-
-  return options;
-}
-
-function getBillTypeOptions(): BillTypeOption[] {
-  return [
-    {type: ALL_BILL_TYPE, name: ALL},
-    {type: PAID, name: "支出"},
-    {type: RECEIVED, name: "收入"}
-  ]
 }
 
 function getBillsForShow(bills: BillData[]): BillData[] {

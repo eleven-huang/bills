@@ -1,4 +1,5 @@
-import {BillData, ALL, ALL_BILL_TYPE} from './bills'
+import {BillData} from './bills'
+import {ALL, ALL_BILL_TYPE} from './constants'
 
 export type BillsAction =
   | { type: "FILTER_MONTH", year: number, month: number}
