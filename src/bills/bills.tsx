@@ -5,6 +5,7 @@ import * as d3 from 'd3-fetch'
 import {Table, Container} from 'react-bootstrap'
 import Statistics from './statistics'
 import Filters, {BillTypeOption, CategoryOption} from './filters'
+import AddBill from './add_bill'
 import {PAID, RECEIVED} from './constants'
 
 
@@ -52,6 +53,11 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
       getData();
     }, [])
 
+    const billAdded = (bill: BillData): void => {
+      console.log(bill);
+      dispatch({type: "ADD", bill: bill})
+    }
+
     const selectDate = (date: any): void => {
       if (date === null) {
         dispatch({type: "SHOW_ALL"});
@@ -77,7 +83,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
             <td>{bill.amount}</td>
             <td>{category.name}</td>
             <td>{dateFormat(bill.time)}</td>
-            <td className={cssClassNameForBillType(bill.type)}>{billTypeName(bill.type)}</td>
+            <td className={cssClassNameForBillType(bill.type)}>{getBillTypeName(bill.type)}</td>
           </tr>
         )
     });
@@ -85,7 +91,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
     return (
       <Container className="container" fluid="md">
         <Filters categories={categories} selectDate={selectDate} selectCategoryOption={selectCategoryOption} selectBillTypeOption={selectBillTypeOption} />
-
+        <span className="add-bill"><AddBill categories={categories} billAdded={billAdded} /></span>
         <Table className="bills" striped bordered hover>
           <thead>
             <tr>
@@ -129,7 +135,7 @@ function getConstructedBillData(data: any): BillData[] {
     const type: number = parseInt(bill.type);
     const time: number = parseInt(bill.time);
 
-    bills.push({type, amount, time: time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true, isFilteredByBillType: true});
+    bills.push({type, amount, time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true, isFilteredByBillType: true});
   })
 
   return bills;
@@ -138,13 +144,13 @@ function getConstructedBillData(data: any): BillData[] {
 function getCategoryById(categories: CategoryData[], id: string): CategoryData {
   const category: CategoryData | undefined = categories.find((category: CategoryData) => category.id === id);
   if (category === undefined) {
-      throw new Error("Wrong categories or bills data");
+      throw new Error(`Wrong category id: ${id}`);
   }
 
   return category;
 }
 
-function billTypeName(type: number): string {
+function getBillTypeName(type: number): string {
   if (type === RECEIVED) return "收入";
 
   return "支出";
@@ -174,7 +180,7 @@ function billsReceivedAmount(bills: BillData[]): number {
 
 function dateFormat(timestamp: number): string {
   const date = new Date(timestamp);
-  return date.toLocaleDateString("zh-CN")
+  return date.toLocaleString("zh-CN")
 }
 
 function getBillsForShow(bills: BillData[]): BillData[] {
@@ -189,3 +195,6 @@ function cssClassNameForBillType(bill_type: number): string {
 
 
 export default Bills;
+export {
+  getBillTypeName
+}

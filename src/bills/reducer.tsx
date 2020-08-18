@@ -5,6 +5,7 @@ export type BillsAction =
   | { type: "FILTER_MONTH", year: number, month: number}
   | { type: "FILTER_CATEGORY", category: string}
   | { type: "FILTER_BILL_TYPE", bill_type: number }
+  | { type: "ADD", bill: BillData }
   | { type: "RESET", bills: BillData[]}
   | { type: "SHOW_ALL"};
 
@@ -55,6 +56,8 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
 
         return billsInTheSameType;
       }
+    case "ADD":
+      return [...bills, action.bill];
     case "RESET":
       return action.bills;
     case "SHOW_ALL":
