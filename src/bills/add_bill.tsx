@@ -113,7 +113,7 @@ function getListCategoryOptions(categories: CategoryData[]) {
 function getCategoryTypeForName(name: string, categories: CategoryData[]): number {
   const category: CategoryData | undefined = categories.find((category: CategoryData) => category.name === name);
   if (category === undefined) {
-    throw new Error(`Wrong category name: ${name}`);
+    throw new Error("账单数据出错，请联系客服处理。");
   }
 
   return category.type;
@@ -122,7 +122,7 @@ function getCategoryTypeForName(name: string, categories: CategoryData[]): numbe
 function getCategoryIdForName(name: string, categories: CategoryData[]): string {
   const category: CategoryData | undefined = categories.find((category: CategoryData) => category.name === name);
   if (category === undefined) {
-    throw new Error(`Wrong category name: ${name}`);
+    throw new Error("账单数据出错，请联系客服处理。");
   }
 
   return category.id;

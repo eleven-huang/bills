@@ -103,7 +103,7 @@ const Bills: React.FunctionComponent<Props> = (props): JSX.Element => {
 function getCategoryById(categories: CategoryData[], id: string): CategoryData {
   const category: CategoryData | undefined = categories.find((category: CategoryData) => category.id === id);
   if (category === undefined) {
-      throw new Error(`Wrong category id: ${id}`);
+      throw new Error("账单数据出错，请联系客服处理。");
   }
 
   return category;
