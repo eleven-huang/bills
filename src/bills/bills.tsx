@@ -1,7 +1,6 @@
-import React, {useReducer, useState, useMemo} from 'react';
+import React, {useReducer, useEffect} from 'react';
 import {reducer} from './reducer';
 import './bills.css'
-import * as d3 from 'd3-fetch'
 import {Table, Container} from 'react-bootstrap'
 import Statistics from './statistics'
 import Filters, {BillTypeOption, CategoryOption} from './filters'
@@ -25,33 +24,17 @@ export type CategoryData = {
   name: string
 }
 
-const Bills: React.FunctionComponent = (): JSX.Element => {
-    const [categories, setCategories] = useState<CategoryData[]>([]);
-    const [bills, dispatch] = useReducer(reducer, []);
+type Props = {
+  bills: BillData[],
+  categories: CategoryData[]
+}
 
-    const getData = (): void => {
-      //get categories first
-      var csv_file_path = require("./data/bill_categories.csv");
-      d3.csv(csv_file_path).then(function(data) {
-        const categories = getConstructedCategoryData(data);
-        setCategories(categories);
+const Bills: React.FunctionComponent<Props> = (props): JSX.Element => {
+    const [bills, dispatch] = useReducer(reducer, props.bills);
 
-        getBills();
-      });
-    };
-
-    const getBills = (): void => {
-      var csv_file_path = require("./data/bills.csv");
-      d3.csv(csv_file_path).then(function(data) {
-        const bills: BillData[] = getConstructedBillData(data);
-        dispatch({type: "RESET", bills: bills});
-      });
-    }
-
-    //init values
-    useMemo(() => {
-      getData();
-    }, [])
+    useEffect(() => {
+      dispatch({type: "RESET", bills: props.bills})
+    }, [props.bills, props.categories])
 
     const billAdded = (bill: BillData): void => {
       console.log(bill);
@@ -76,7 +59,7 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
 
     const billsForShow = getBillsForShow(bills);
     const listBills = billsForShow.map((bill: BillData, index: number) => {
-        const category: CategoryData = getCategoryById(categories, bill.category);
+        const category: CategoryData = getCategoryById(props.categories, bill.category);
 
         return(
           <tr key={index}>
@@ -90,8 +73,8 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
 
     return (
       <Container className="container" fluid="md">
-        <Filters categories={categories} selectDate={selectDate} selectCategoryOption={selectCategoryOption} selectBillTypeOption={selectBillTypeOption} />
-        <span className="add-bill"><AddBill categories={categories} billAdded={billAdded} /></span>
+        <Filters categories={props.categories} selectDate={selectDate} selectCategoryOption={selectCategoryOption} selectBillTypeOption={selectBillTypeOption} />
+        <span className="add-bill"><AddBill categories={props.categories} billAdded={billAdded} /></span>
         <Table className="bills" striped bordered hover>
           <thead>
             <tr>
@@ -112,33 +95,9 @@ const Bills: React.FunctionComponent = (): JSX.Element => {
           </tbody>
         </Table>
 
-        <Statistics bills={billsForShow} categories={categories}/>
+        <Statistics bills={billsForShow} categories={props.categories}/>
       </Container>
     )
-}
-
-function getConstructedCategoryData(data: any): CategoryData[] {
-  const categories: CategoryData[] = [];
-  data.forEach((category: any) => {
-    const type = parseInt(category.type);
-
-    categories.push({type, id: category.id, name: category.name});
-  })
-
-  return categories;
-}
-
-function getConstructedBillData(data: any): BillData[] {
-  const bills: BillData[] = [];
-  data.forEach((bill: any) => {
-    const amount: number = parseFloat(bill.amount);
-    const type: number = parseInt(bill.type);
-    const time: number = parseInt(bill.time);
-
-    bills.push({type, amount, time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true, isFilteredByBillType: true});
-  })
-
-  return bills;
 }
 
 function getCategoryById(categories: CategoryData[], id: string): CategoryData {
