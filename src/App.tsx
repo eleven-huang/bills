@@ -4,7 +4,7 @@ import './App.css';
 import Bills, {BillData, CategoryData} from './bills/bills'
 import Header from './header/header'
 import * as d3 from 'd3-fetch'
-import ErrorBoundary from './error_boundary'
+import ErrorBoundary from './others/error_boundary'
 
 const App: React.FunctionComponent = (): JSX.Element => {
   const [bills, setBills] = useState<BillData[]>([]);
