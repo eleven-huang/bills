@@ -30,7 +30,7 @@ type Props = {
 }
 
 const Bills: React.FunctionComponent<Props> = (props): JSX.Element => {
-    const [bills, dispatch] = useReducer(reducer, props.bills);
+    const [bills, dispatch] = useReducer(reducer, []);
 
     useEffect(() => {
       dispatch({type: "RESET", bills: props.bills})

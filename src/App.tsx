@@ -56,8 +56,9 @@ function getConstructedBillData(data: any): BillData[] {
     const amount: number = parseFloat(bill.amount);
     const type: number = parseInt(bill.type);
     const time: number = parseInt(bill.time);
+    const [isFilteredByMonth, isFilteredByBillType, isFilteredByCategory] = [true, true, true];
 
-    bills.push({type, amount, time, category: bill.category, isFilteredByMonth: true, isFilteredByCategory: true, isFilteredByBillType: true});
+    bills.push({type, amount, time, category: bill.category, isFilteredByMonth, isFilteredByCategory, isFilteredByBillType});
   })
 
   return bills;
