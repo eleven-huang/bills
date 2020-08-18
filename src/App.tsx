@@ -4,6 +4,7 @@ import './App.css';
 import Bills, {BillData, CategoryData} from './bills/bills'
 import Header from './header/header'
 import * as d3 from 'd3-fetch'
+import ErrorBoundary from './error_boundary'
 
 const App: React.FunctionComponent = (): JSX.Element => {
   const [bills, setBills] = useState<BillData[]>([]);
@@ -33,8 +34,10 @@ const App: React.FunctionComponent = (): JSX.Element => {
 
   return (
     <div className="App">
-      <Header />
-      <Bills bills={bills} categories={categories}/>
+        <Header />
+        <ErrorBoundary>
+          <Bills bills={bills} categories={categories}/>
+        </ErrorBoundary>
     </div>
   );
 }
