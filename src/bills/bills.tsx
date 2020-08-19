@@ -24,7 +24,7 @@ export type CategoryData = {
   name: string
 }
 
-type Props = {
+export type Props = {
   bills: BillData[],
   categories: CategoryData[]
 }

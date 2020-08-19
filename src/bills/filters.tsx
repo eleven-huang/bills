@@ -68,7 +68,7 @@ const Filters: React.FunctionComponent<Props> = (props): JSX.Element => {
 
   return(
     <span className="filters">
-      <span className="filter">
+      <span className="filter month-filter">
         <strong className="filterName">月份</strong>
         <DatePicker
           selected={selectedDate}
@@ -80,7 +80,7 @@ const Filters: React.FunctionComponent<Props> = (props): JSX.Element => {
           openToDate={new Date("2019/01/01")}
         />
       </span>
-      <span className="filter">
+      <span className="filter category-filter">
         <strong className="filterName">分类</strong>
         <Dropdown>
           <Dropdown.Toggle variant="light" id="dropdown-light">
@@ -92,7 +92,7 @@ const Filters: React.FunctionComponent<Props> = (props): JSX.Element => {
           </Dropdown.Menu>
         </Dropdown>
       </span>
-      <span className="filter">
+      <span className="filter bill-type-filter">
         <strong className="filterName">类型</strong>
         <Dropdown>
           <Dropdown.Toggle variant="light" id="dropdown-light">

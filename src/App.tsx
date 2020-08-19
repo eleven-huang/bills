@@ -16,6 +16,7 @@ const App: React.FunctionComponent = (): JSX.Element => {
     d3.csv(csv_file_path).then(function(data) {
       const categories = getConstructedCategoryData(data);
       setCategories(categories);
+
       getBills();
     });
   };

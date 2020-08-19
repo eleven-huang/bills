@@ -97,3 +97,6 @@ function getStatisticsAmount(statistics: BillStatistic[]): number {
 }
 
 export default Statistics;
+export {
+  getBillStatistics
+}

@@ -70,7 +70,7 @@ export function reducer(bills: BillData[], action: BillsAction): BillData[] {
   }
 }
 
-function isTheRightMonth(bill: BillData, year: number, month: number) {
+export function isTheRightMonth(bill: BillData, year: number, month: number) {
   const date = new Date(bill.time);
   return (date.getFullYear() === year && date.getMonth() === month)
 }

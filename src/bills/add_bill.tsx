@@ -59,7 +59,7 @@ const AddBill: React.FunctionComponent<Props> = (props): JSX.Element => {
         添加账单
       </Button>
 
-      <Modal show={show} onHide={handleClose} animation={false}>
+      <Modal className="add-bill-modal" show={show} onHide={handleClose} animation={false}>
         <Modal.Header closeButton>
           <Modal.Title>添加账单</Modal.Title>
         </Modal.Header>
@@ -67,21 +67,21 @@ const AddBill: React.FunctionComponent<Props> = (props): JSX.Element => {
         <Form>
           <Form.Group>
             <Form.Label>金额</Form.Label>
-            <Form.Control type="number" placeholder="" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAmount(parseFloat(event.target.value))} autoFocus/>
+            <Form.Control type="number" name="amount" placeholder="" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setAmount(parseFloat(event.target.value))} autoFocus/>
           </Form.Group>
           <Form.Group>
             <Form.Label>日期</Form.Label>
-            <Form.Control type="datetime-local" placeholder="" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDate(event.target.value)} />
+            <Form.Control type="datetime-local" name="date" placeholder="" onChange={(event: React.ChangeEvent<HTMLInputElement>) => setDate(event.target.value)} />
           </Form.Group>
           <Form.Group>
           <Form.Label>分类</Form.Label>
-          <Form.Control as="select" defaultValue="" onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCategoryChange(event.target.value)}>
+          <Form.Control as="select" defaultValue="" name="category" onChange={(event: React.ChangeEvent<HTMLInputElement>) => handleCategoryChange(event.target.value)}>
             {getListCategoryOptions(props.categories)}
           </Form.Control>
           </Form.Group>
           <Form.Group>
             <Form.Label>类型</Form.Label>
-            <Form.Control type="text" placeholder="" value={typeName} readOnly/>
+            <Form.Control type="text" name="type" placeholder="" value={typeName} readOnly/>
           </Form.Group>
         </Form>
         </Modal.Body>
@@ -89,7 +89,7 @@ const AddBill: React.FunctionComponent<Props> = (props): JSX.Element => {
           <Button variant="light" onClick={handleClose}>
             关闭
           </Button>
-          <Button variant="dark" onClick={add} disabled={isDisableAddButton()}>
+          <Button className="submit" variant="dark" onClick={add} disabled={isDisableAddButton()}>
             添加
           </Button>
         </Modal.Footer>
