@@ -1,7 +1,3 @@
----
-typora-copy-images-to: screen_shoots
----
-
 # Bills
 	React + Typescript
 
