@@ -17,8 +17,17 @@ typora-copy-images-to: screen_shoots
 
 ## Screenshoot
 
-![Screenshot](D:\mywork\javascript\bills\screen_shoots\Screenshot.png)
+![](https://github.com/eleven-huang/bills/raw/master/screen_shoots/1.png)
 
 
 
-![2](D:\mywork\javascript\bills\screen_shoots\2.png)
+![](https://github.com/eleven-huang/bills/raw/master/screen_shoots/2.png)
+
+
+
+![](https://github.com/eleven-huang/bills/raw/master/screen_shoots/3.png)
+
+
+
+
+
